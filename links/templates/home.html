@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Shorten a Link · Kite Short{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="p-4 bg-white rounded-3 shadow-sm">
+      <h1 class="h4 mb-3">Shorten a long URL</h1>
+      <form method="post" class="row g-3" oninput="suggestCode()">
+        {% csrf_token %}
+        <div class="col-12">
+          <label class="form-label">{{ form.original_url.label }}</label>
+          {{ form.original_url }}
+          {% for error in form.original_url.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ form.custom_code.label }}</label>
+          {{ form.custom_code }}
+          <div class="form-text">Tip: leave blank to auto-generate or use the suggested placeholder.</div>
+          {% for error in form.custom_code.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ form.expires_in_days.label }}</label>
+          {{ form.expires_in_days }}
+          <div class="form-text">Default: 7 days</div>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary">Create short link</button>
+        </div>
+      </form>
+
+      {% if new_short %}
+      <hr class="my-4">
+      <div class="d-flex align-items-center gap-2">
+        <input id="short-url" class="form-control" value="{{ new_short }}" readonly>
+        <button class="btn btn-outline-secondary" onclick="copySel('short-url')">Copy</button>
+        <a href="{{ new_short }}" target="_blank" class="btn btn-success">Open</a>
+      </div>
+      {% if og.title or og.image %}
+      <div class="mt-3 d-flex align-items-center gap-3">
+        {% if og.image %}<img src="{{ og.image }}" alt="preview" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #eee">{% endif %}
+        <div class="small text-muted">{{ og.title }}</div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="mt-4 p-4 bg-white rounded-3 shadow-sm">
+      <h2 class="h6 mb-3">Recent links</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Code</th><th>Original</th><th>Clicks</th><th>Expires</th></tr></thead>
+          <tbody>
+            {% for item in latest %}
+            <tr>
+              <td><a href="/{{ item.code }}/" target="_blank">{{ item.code }}</a> · <a class="small" href="/stats/{{ item.code }}/">stats</a></td>
+              <td style="max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <a href="/{{ item.code }}/" target="_blank">{{ item.original_url }}</a>
+              </td>
+              <td>{{ item.clicks }}</td>
+              <td>{% if item.expires_at %}{{ item.expires_at|date:"Y-m-d H:i" }}{% else %}<span class="text-muted">never</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted">No links yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

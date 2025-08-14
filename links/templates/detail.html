@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Stats · Kite Short{% endblock %}
+{% block content %}
+<div class="col-lg-8 mx-auto">
+  <div class="p-4 bg-white rounded-3 shadow-sm">
+    <h1 class="h5">Stats for <code>{{ item.code }}</code></h1>
+    <p class="mb-1"><strong>Target:</strong> <a href="/{{ item.code }}/" target="_blank">{{ item.original_url }}</a></p>
+    <p class="mb-1"><strong>Clicks:</strong> {{ item.clicks }}</p>
+    <p class="mb-1"><strong>Created:</strong> {{ item.created_at|date:"Y-m-d H:i" }}</p>
+    <p class="mb-3"><strong>Expires:</strong> {% if item.expires_at %}{{ item.expires_at|date:"Y-m-d H:i" }}{% else %}<span class="text-muted">never</span>{% endif %}</p>
+    {% if item.image_url %}<img src="{{ item.image_url }}" alt="" style="max-width:200px;border-radius:8px;border:1px solid #eee">{% endif %}
+    {% if item.title %}<div class="mt-2 small text-muted">{{ item.title }}</div>{% endif %}
+  </div>
+</div>
+{% endblock %}
